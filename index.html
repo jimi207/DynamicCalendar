@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Datepicker with Highlighted Dates</title>
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      
+  /* Hidden state for calendar wrapper */
+  .calendar-wrapper.is-hidden { display: none; }
+      
+      .calendar-wrapper {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .reset-btn {
+        color: #4a90e2;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      
+      .trip-info {
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .done-btn {
+        background: #4a90e2;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      
+      .date-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .date-input-group input {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 120px;
+        text-align: center;
+      }
+      
+      .ui-datepicker {
+        width: 100%;
+        border: none;
+        box-shadow: none;
+      }
+      
+      .ui-datepicker-multi {
+        width: 100%;
+      }
+      
+      .ui-datepicker-multi .ui-datepicker-group {
+        width: 48%;
+        margin: 0 1%;
+      }
+      
+      .ui-datepicker-header {
+        background: none;
+        border: none;
+        padding: 10px 0;
+        text-align: center;
+      }
+      
+      .ui-datepicker-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #4a90e2;
+      }
+      
+      .ui-datepicker-prev, .ui-datepicker-next {
+        background: none;
+        border: none;
+        cursor: pointer;
+        top: 10px;
+      }
+      
+      .ui-datepicker table {
+        width: 100%;
+        margin: 0;
+      }
+      
+      .ui-datepicker th {
+        background: none;
+        border: none;
+        font-weight: 500;
+        color: #999;
+        padding: 8px 2px;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      
+      .ui-datepicker td {
+        border: none;
+        padding: 2px;
+        position: relative;
+      }
+      
+      .ui-datepicker td a, .ui-datepicker td span {
+        display: block;
+        width: 100%;
+        height: 50px;
+        border: none;
+        text-decoration: none;
+        color: #333;
+        text-align: center;
+        padding: 4px 2px;
+        border-radius: 6px;
+        position: relative;
+        line-height: 1.2;
+      }
+      
+      .ui-datepicker td a {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+      }
+      
+      .ui-datepicker td a:hover {
+        background: #e9ecef;
+      }
+      
+      .fare-price {
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        color: #666;
+        white-space: nowrap;
+      }
+      
+      /* Range selection styles - Higher specificity */
+      .ui-datepicker td.range-start a,
+      .ui-datepicker td.range-start a:hover,
+      .ui-datepicker td.range-start a:focus {
+        background: #2c5aa0 !important;
+        color: white !important;
+        border-color: #2c5aa0 !important;
+      }
+      
+      .ui-datepicker td.range-end a,
+      .ui-datepicker td.range-end a:hover,
+      .ui-datepicker td.range-end a:focus {
+        background: #2c5aa0 !important;
+        color: white !important;
+        border-color: #2c5aa0 !important;
+      }
+      
+      .ui-datepicker td.range-middle a,
+      .ui-datepicker td.range-middle a:hover,
+      .ui-datepicker td.range-middle a:focus {
+        background: #b3d4fc !important;
+        color: #333 !important;
+        border-color: #b3d4fc !important;
+      }
+      
+      .ui-datepicker td.range-start.range-end a,
+      .ui-datepicker td.range-start.range-end a:hover,
+      .ui-datepicker td.range-start.range-end a:focus {
+        background: #2c5aa0 !important;
+        color: white !important;
+      }
+      
+      /* Fare price visibility on highlighted days - Higher specificity */
+      .ui-datepicker td.range-start a .fare-price,
+      .ui-datepicker td.range-end a .fare-price,
+      .ui-datepicker td.range-start.range-end a .fare-price {
+        color: rgba(255, 255, 255, 0.95) !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      
+      .ui-datepicker td.range-middle a .fare-price {
+        color: #1a365d !important;
+        font-weight: 600 !important;
+      }
+      
+      .ui-datepicker td.ui-datepicker-other-month a {
+        color: #ccc;
+        background: #f8f9fa;
+      }
+      
+      .ui-datepicker td.ui-datepicker-unselectable a,
+      .ui-datepicker td.ui-datepicker-unselectable span {
+        color: #000 !important;
+        background: #f5f5f5 !important;
+        border-color: #e9ecef !important;
+        cursor: not-allowed !important;
+        opacity: 0.75;
+      }
+      
+      .ui-datepicker td.ui-datepicker-unselectable a:hover {
+        background: #f5f5f5 !important;
+        color: #ccc !important;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="dateSelectionForm" class="date-form" onsubmit="return false;">
+      <div class="date-inputs">
+        <div class="date-input-group">
+          <label>Departure</label><br>
+          <input type="text" id="departureDate" name="departureDate" readonly placeholder="Select date" />
+        </div>
+        <div class="date-input-group">
+          <label>Return</label><br>
+          <input type="text" id="returnDate" name="returnDate" readonly placeholder="Select date" />
+        </div>
+      </div>
+    </form>
+  <div class="calendar-wrapper is-hidden">
+      <div class="calendar-header">
+        <a href="#" class="reset-btn" onclick="resetDates()">🔄 Reset dates</a>
+        <span class="trip-info">Trip from <strong>MYR 1.10k</strong> per adult</span>
+        <button class="done-btnecho "# DynamicCalendar" >> README.md" onclick="completeDateSelection()">Done</button>
+      </div>
+      <div id="dateRangeCalendar"></div>
+    </div>
+
+    <script>
+      const str = "24.06.2025";
+      const date = new Date(str.split(".").reverse().join("-"));
+const departDataURL = 'https://farecapx.flyroyalbrunei.com/availableFlightDates?depPort=BWN&arrPort=SIN&startDate=18.09.2025&endDate=18.09.2026&tripType=RT&direction=OUT&cabin=Y';
+const returnDataURL = 'https://farecapx.flyroyalbrunei.com/availableFlightDates?depPort=BWN&arrPort=SIN&startDate=18.09.2025&endDate=18.09.2026&tripType=RT&direction=IN&cabin=Y';
+
+      let departureData = {};
+      let returnData = {};
+      let selectedDeparture = null;
+      let selectedReturn = null;
+      
+      // Function to add fare prices to calendar cells
+      function addFarePrices() {
+        setTimeout(() => {
+          $('.ui-datepicker td').each(function() {
+            const $cell = $(this);
+            const year = $cell.data('year');
+            const month = $cell.data('month');
+            const day = parseInt($cell.text());
+            
+            if (year && month !== undefined && day && !isNaN(day)) {
+              const cellDate = new Date(year, month, day);
+              const dateString = cellDate.toDateString();
+              
+              // Remove existing fare price
+              $cell.find('.fare-price').remove();
+              
+              // Check for departure or return fare
+              let fare = departureData[dateString] || returnData[dateString];
+              
+              if (fare) {
+                $cell.find('a').append(`<span class="fare-price">${fare}</span>`);
+              }
+            }
+          });
+          // Apply range highlighting after fare prices are added
+          updateRangeHighlight();
+        }, 50);
+      }
+      
+      // Function to update range highlighting
+      function updateRangeHighlight() {
+        $('.ui-datepicker td').removeClass('range-start range-middle range-end');
+        
+        if (selectedDeparture && selectedReturn) {
+          const startDate = new Date(selectedDeparture);
+          const endDate = new Date(selectedReturn);
+          
+          $('.ui-datepicker td').each(function() {
+            const $cell = $(this);
+            const year = $cell.data('year');
+            const month = $cell.data('month');
+            const day = parseInt($cell.find('a').length ? $cell.find('a').contents().filter(function() {
+                return this.nodeType === 3; // Node.TEXT_NODE
+            }).text() : $cell.text());
+
+            //console.log('Processing cell:', year, month, day);
+            
+            if (year && month !== undefined && day && !isNaN(day)) {
+                console.log('Processing day:', day);
+              const cellDate = new Date(year, month, day);
+
+              if (cellDate.getTime() === startDate.getTime()) {
+                $cell.addClass('range-start');
+                if (cellDate.getTime() === endDate.getTime()) {
+                  $cell.addClass('range-end');
+                }
+              } else if (cellDate.getTime() === endDate.getTime()) {
+                console.log('Adding range-end class to:', cellDate);
+                $cell.addClass('range-end');
+              } else if (cellDate > startDate && cellDate < endDate) {
+                console.log('Adding range-middle class to:', cellDate);
+                $cell.addClass('range-middle');
+              }
+            }
+          });
+        }
+      }
+      
+      // Reset dates function
+      function resetDates() {
+        selectedDeparture = null;
+        selectedReturn = null;
+        $("#departureDate").val('');
+        $("#returnDate").val('');
+        updateRangeHighlight();
+      }
+      
+      // Complete date selection function
+      function completeDateSelection() {
+        if (selectedDeparture && selectedReturn) {
+          alert(`Departure: ${$("#departureDate").val()}\nReturn: ${$("#returnDate").val()}`);
+          $(".calendar-wrapper").addClass('is-hidden');
+        } else {
+          alert('Please select both departure and return dates.');
+          // Keep the calendar open to allow completion
+        }
+      }
+
+      // Show calendar when clicking on the departure input only
+      $(document).on('click', '#departureDate', function(e) {
+        e.preventDefault();
+        $(".calendar-wrapper").removeClass('is-hidden');
+      });
+
+      // Fetch both datasets and initialize the calendar
+      Promise.all([
+        fetch(departDataURL).then(response => response.json()),
+        fetch(returnDataURL).then(response => response.json())
+      ])
+        .then(([departJson, returnJson]) => {
+          console.log('[DEBUG] Departure data:', departJson);
+          console.log('[DEBUG] Return data:', returnJson);
+          
+          // Process departure data
+          departJson.availableDates.forEach(item => {
+            const fltDate = item.flightDate.split(".").reverse().join("-");
+            departureData[new Date(fltDate).toDateString()] = item.fare;
+          });
+          
+          // Process return data
+          returnJson.availableDates.forEach(item => {
+            const fltDate = item.flightDate.split(".").reverse().join("-");
+            returnData[new Date(fltDate).toDateString()] = item.fare;
+          });
+
+          $("#dateRangeCalendar").datepicker({
+            inline: true,
+            numberOfMonths: 2,
+            showOtherMonths: true,
+            selectOtherMonths: false,
+            minDate: 0, // Today
+            maxDate: 360, // 360 days from today
+            defaultDate: 0, // Set default to today
+            beforeShowDay: function (date) {
+              const dateString = date.toDateString();
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Reset time to start of day
+              const maxDate = new Date();
+              maxDate.setDate(today.getDate() + 360);
+              maxDate.setHours(23, 59, 59, 999); // Set to end of day
+              
+              // Normalize the input date to start of day for comparison
+              const compareDate = new Date(date);
+              compareDate.setHours(0, 0, 0, 0);
+              
+              // Check if date is within allowed range
+              if (compareDate < today || compareDate > maxDate) {
+                return [false, "ui-datepicker-unselectable", "Date not available"];
+              }
+              
+              const isDepartureAvailable = departureData[dateString];
+              const isReturnAvailable = returnData[dateString];
+              
+              if (isDepartureAvailable || isReturnAvailable) {
+                return [true, "", ""];
+              }
+              return [true, "", ""];
+            },
+            onSelect: function(dateText, inst) {
+              const selectedDate = $.datepicker.parseDate('mm/dd/yy', dateText);
+              const dateString = selectedDate.toDateString();
+              
+              // Format date as dd.mm.yyyy
+              const formattedDate = ("0" + selectedDate.getDate()).slice(-2) + "." + 
+                                   ("0" + (selectedDate.getMonth() + 1)).slice(-2) + "." + 
+                                   selectedDate.getFullYear();
+              
+              if (!selectedDeparture || (selectedDeparture && selectedReturn)) {
+                // Select departure date
+                selectedDeparture = selectedDate;
+                selectedReturn = null;
+                $("#departureDate").val(formattedDate);
+                $("#returnDate").val('');
+                console.log('Departure selected:', formattedDate);
+              } else if (selectedDeparture && !selectedReturn) {
+                // Select return date
+                if (selectedDate >= selectedDeparture) {
+                  selectedReturn = selectedDate;
+                  $("#returnDate").val(formattedDate);
+                  console.log('Return selected:', formattedDate);
+                } else {
+                  // If selected date is before departure, make it the new departure
+                  selectedDeparture = selectedDate;
+                  selectedReturn = null;
+                  $("#departureDate").val(formattedDate);
+                  $("#returnDate").val('');
+                  console.log('New departure selected:', formattedDate);
+                }
+              }
+              
+              addFarePrices();
+            },
+            onChangeMonthYear: function() {
+              addFarePrices();
+            }
+          });
+          
+          // Initial fare price setup
+          addFarePrices();
+          
+          // Auto-select today's date as departure
+          const today = new Date();
+          const todayFormatted = ("0" + today.getDate()).slice(-2) + "." + 
+                                ("0" + (today.getMonth() + 1)).slice(-2) + "." + 
+                                today.getFullYear();
+          selectedDeparture = today;
+          $("#departureDate").val(todayFormatted);
+          console.log('Auto-selected departure date:', todayFormatted);
+          
+          // Update highlighting to show today as selected
+          setTimeout(() => {
+            addFarePrices();
+          }, 100);
+        })
+        .catch(error => {
+          console.error('[ERROR] Failed to fetch flight data:', error);
+          alert('Failed to load flight data. Please check the console for details.');
+        });
+
+
+    </script>
+  </body>
+</html>
