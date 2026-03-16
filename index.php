@@ -24,7 +24,7 @@ header("Access-Control-Allow-Origin: *");
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  
+
   <!-- Custom CSS -->
   <link rel="stylesheet" href="calendar.css">
 </head>
@@ -65,6 +65,7 @@ header("Access-Control-Allow-Origin: *");
                     <option value="BWN" selected>BWN</option>
                     <option value="KUL">KUL</option>
                     <option value="SIN">SIN</option>
+                    <option value="LHR">LHR</option>
                   </select>
                 </div>
                 <div class="col-md-6 col-lg-3">
@@ -79,6 +80,7 @@ header("Access-Control-Allow-Origin: *");
                     <option value="BWN">BWN</option>
                     <option value="KUL">KUL</option>
                     <option value="SIN" selected>SIN</option>
+                    <option value="LHR">LHR</option>
                   </select>
                 </div>
                 <div class="col-md-6 col-lg-3">

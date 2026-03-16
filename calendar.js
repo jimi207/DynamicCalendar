@@ -95,11 +95,14 @@ function calculateTotalFare() {
     `${departureFare} + ${returnFare} = ${totalFare}`,
   );
 
-  const totalFareAmount =
+  let totalFareAmount =
     totalFare > 0 ? `${fareCurrency} ${totalFare}` : "N/A";
-
-  if (!isOneWaySelected && returnFare === 0) {
-    totalFareAmount = "N/A";
+//console.log("isOneWaySelected", isOneWaySelected);
+  if (!isOneWaySelected) {
+    if (departureFare > 0 && returnFare == 0) {
+      totalFareAmount = "N/A";
+    }
+    console.log('returnfare: ' + returnFare);
   }
 
   if (totalFareAmount !== "N/A") {
@@ -108,7 +111,11 @@ function calculateTotalFare() {
           Total fare from <strong>${totalFareAmount}</strong> per adult
         </span>
       `);
+  } else {
+    $("#totalFare").html(``);
+    totalFare = 0;
   }
+
 
   return totalFare;
 }
@@ -127,10 +134,10 @@ function addFarePrices(leg = "departure", departureDataSrc, returnDateSrc) {
       );
 
       if (year && month !== undefined && day && !isNaN(day)) {
-        console.log("Processing cell for date:", year, month, day);
+        //console.log("Processing cell for date:", year, month, day);
         const cellDate = new Date(year, month, day);
         const dateString = cellDate.toDateString();
-        console.log(`Processing cell for date: ${dateString} (leg: ${leg})`);
+        //console.log(`Processing cell for date: ${dateString} (leg: ${leg})`);
 
         // Remove existing fare price
         $cell.find(".fare-price").remove();
@@ -158,7 +165,7 @@ function addFarePrices(leg = "departure", departureDataSrc, returnDateSrc) {
         if (fare) {
           $cell.find("a").append(`<span class="fare-price">${fare}</span>`);
         } else {
-          console.log(`No fare for ${dateString} (leg: ${leg})`);
+          //console.log(`No fare for ${dateString} (leg: ${leg})`);
         }
       }
     });
